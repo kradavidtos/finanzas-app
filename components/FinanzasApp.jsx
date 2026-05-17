@@ -237,13 +237,20 @@ const NAV=[
   {id:"configuracion",l:"Configuración",ic:"settings"},
 ];
 
+const LogoFlore=({col})=>{
+  const [ok,setOk]=useState(false);
+  useEffect(()=>{const i=new Image();i.onload=()=>setOk(true);i.onerror=()=>setOk(false);i.src="/logo.png";},[]);
+  if(ok)return <img src="/logo.png" alt="Logo" style={{width:col?32:110,height:col?32:38,objectFit:"contain",borderRadius:col?8:0,transition:"width .26s"}}/>;
+  return(<>
+    <div style={{width:32,height:32,borderRadius:9,background:`linear-gradient(135deg,${C.botanico},${C.sage})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="leaf" sz={16} c={C.cream}/></div>
+    {!col&&<div><div style={{fontFamily:FD,fontSize:14,fontWeight:600,color:C.charcoal,lineHeight:1.1}}>Flore</div><div style={{fontSize:9,color:C.graysoft,letterSpacing:".08em",textTransform:"uppercase"}}>finanzas</div></div>}
+  </>);
+};
+
 const Sidebar=({active,go,col,setCol})=>(
   <div className="sd" style={{width:col?58:210,background:C.white,borderRight:`1px solid ${C.graylight}`,display:"flex",flexDirection:"column",padding:"20px 10px",transition:"width .26s ease",flexShrink:0,overflow:"hidden"}}>
     <div style={{padding:"0 3px 24px",display:"flex",alignItems:"center",gap:8,overflow:"hidden"}}>
-      <div style={{width:32,height:32,borderRadius:9,background:`linear-gradient(135deg,${C.botanico},${C.sage})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-        <Ic n="leaf" sz={16} c={C.cream}/>
-      </div>
-      {!col&&<div><div style={{fontFamily:FD,fontSize:14,fontWeight:600,color:C.charcoal,lineHeight:1.1}}>Flore</div><div style={{fontSize:9,color:C.graysoft,letterSpacing:".08em",textTransform:"uppercase"}}>finanzas</div></div>}
+      <LogoFlore col={col}/>
     </div>
     <nav style={{flex:1,display:"flex",flexDirection:"column",gap:1}}>
       {NAV.map(n=>(
@@ -257,6 +264,27 @@ const Sidebar=({active,go,col,setCol})=>(
       style={{marginTop:4,justifyContent:col?"center":"flex-start",padding:"8px 12px",fontSize:11}}>
       <Ic n="chevron" sz={13}/>{!col&&"Colapsar"}
     </button>
+  </div>
+);
+
+const NAV_MOB=[
+  {id:"dashboard",l:"Inicio",ic:"home"},
+  {id:"ingresos",l:"Ingresos",ic:"income"},
+  {id:"deudas",l:"Deudas",ic:"debt"},
+  {id:"gastos",l:"Gastos",ic:"expense"},
+  {id:"distribucion",l:"Repartir",ic:"distribute"},
+];
+const BottomNav=({active,go})=>(
+  <div style={{position:"fixed",bottom:0,left:0,right:0,background:C.white,borderTop:`1px solid ${C.graylight}`,display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
+    {NAV_MOB.map(n=>(
+      <button key={n.id} onClick={()=>go(n.id)}
+        style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0 6px",color:active===n.id?C.botanico:C.graysoft,fontSize:9,fontFamily:FB,fontWeight:active===n.id?600:400,transition:".14s"}}>
+        <div style={{width:30,height:30,borderRadius:9,background:active===n.id?`${C.botanico}15`:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          <Ic n={n.ic} sz={17} c={active===n.id?C.botanico:C.graysoft}/>
+        </div>
+        <span style={{textTransform:"uppercase",letterSpacing:".03em"}}>{n.l}</span>
+      </button>
+    ))}
   </div>
 );
 
@@ -1075,11 +1103,12 @@ export default function FinanzasApp(){
   return(
     <div className="fr">
       <Sidebar active={section} go={s=>{setSection(s);}} col={col} setCol={setCol}/>
-      <main style={{flex:1,overflow:"auto",padding:"26px",background:C.cream}} className="mp">
+      <main style={{flex:1,overflow:"auto",padding:"26px 26px 90px",background:C.cream}} className="mp">
         <div style={{maxWidth:800,margin:"0 auto"}}>
           {SCREENS[section]||SCREENS.dashboard}
         </div>
       </main>
+      <BottomNav active={section} go={setSection}/>
     </div>
   );
 }
