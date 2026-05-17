@@ -237,22 +237,25 @@ const NAV=[
   {id:"configuracion",l:"Configuración",ic:"settings"},
 ];
 
+const LogoIcon=()=>(
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" rx="8" fill="#5A6650"/>
+    <line x1="10" y1="8" x2="10" y2="24" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+    <line x1="10" y1="8" x2="21" y2="8" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+    <line x1="10" y1="16" x2="18" y2="16" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+  </svg>
+);
+
 const LogoFlore=({col})=>{
-  if(col){
-    return(
-      <div style={{width:32,height:32,borderRadius:9,overflow:"hidden",flexShrink:0,background:`linear-gradient(135deg,${C.botanico},${C.sage})`,display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <img src="/logo.svg" alt="Flore" style={{width:28,height:28,objectFit:"contain"}}
-          onError={e=>{e.target.style.display="none";}}/>
-      </div>
-    );
-  }
+  if(col) return <LogoIcon/>;
   return(
-    <img src="/logo.svg" alt="Flore Finanzas"
-      style={{height:38,width:"auto",maxWidth:160,objectFit:"contain"}}
-      onError={e=>{
-        e.target.style.display="none";
-        e.target.parentNode.innerHTML='<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,#4A5240,#7C8C6E);display:flex;align-items:center;justify-content:center;flex-shrink:0"></div><div><div style="font-size:14px;font-weight:600;color:#2C2C2A;line-height:1.1;font-family:Georgia,serif">Flore</div><div style="font-size:9px;color:#8A8A8A;letter-spacing:.08em;text-transform:uppercase">finanzas</div></div></div>';
-      }}/>
+    <div style={{display:"flex",alignItems:"center",gap:9,overflow:"hidden"}}>
+      <LogoIcon/>
+      <div>
+        <div style={{fontFamily:"Georgia,serif",fontSize:16,fontWeight:600,color:C.charcoal,lineHeight:1.1,letterSpacing:"-.3px"}}>Flore</div>
+        <div style={{fontSize:9,color:C.graysoft,letterSpacing:".1em",textTransform:"uppercase"}}>finanzas</div>
+      </div>
+    </div>
   );
 };
 
