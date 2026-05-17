@@ -238,9 +238,14 @@ const NAV=[
 ];
 
 const LogoFlore=({col})=>{
-  const [ok,setOk]=useState(false);
-  useEffect(()=>{const i=new Image();i.onload=()=>setOk(true);i.onerror=()=>setOk(false);i.src="/logo.png";},[]);
-  if(ok)return <img src="/logo.png" alt="Logo" style={{width:col?32:110,height:col?32:38,objectFit:"contain",borderRadius:col?8:0,transition:"width .26s"}}/>;
+  const [hasSvg,setHasSvg]=useState(false);
+  useEffect(()=>{
+    fetch("/logo.svg").then(r=>{if(r.ok)setHasSvg(true);}).catch(()=>{});
+  },[]);
+  if(hasSvg){
+    if(col)return <div style={{width:32,height:32,borderRadius:9,overflow:"hidden",flexShrink:0}}><img src="/logo.svg" alt="Flore" style={{width:32,height:32,objectFit:"cover"}}/></div>;
+    return <img src="/logo.svg" alt="Flore Finanzas" style={{height:40,width:"auto",maxWidth:160,objectFit:"contain"}}/>;
+  }
   return(<>
     <div style={{width:32,height:32,borderRadius:9,background:`linear-gradient(135deg,${C.botanico},${C.sage})`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}><Ic n="leaf" sz={16} c={C.cream}/></div>
     {!col&&<div><div style={{fontFamily:FD,fontSize:14,fontWeight:600,color:C.charcoal,lineHeight:1.1}}>Flore</div><div style={{fontSize:9,color:C.graysoft,letterSpacing:".08em",textTransform:"uppercase"}}>finanzas</div></div>}
@@ -274,19 +279,54 @@ const NAV_MOB=[
   {id:"gastos",l:"Gastos",ic:"expense"},
   {id:"distribucion",l:"Repartir",ic:"distribute"},
 ];
-const BottomNav=({active,go})=>(
-  <div style={{position:"fixed",bottom:0,left:0,right:0,background:C.white,borderTop:`1px solid ${C.graylight}`,display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
-    {NAV_MOB.map(n=>(
-      <button key={n.id} onClick={()=>go(n.id)}
-        style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0 6px",color:active===n.id?C.botanico:C.graysoft,fontSize:9,fontFamily:FB,fontWeight:active===n.id?600:400,transition:".14s"}}>
-        <div style={{width:30,height:30,borderRadius:9,background:active===n.id?`${C.botanico}15`:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
-          <Ic n={n.ic} sz={17} c={active===n.id?C.botanico:C.graysoft}/>
+const NAV_MAS=[
+  {id:"ahorros",l:"Ahorros",ic:"savings"},
+  {id:"metas",l:"Metas",ic:"goal"},
+  {id:"estadisticas",l:"Estadísticas",ic:"stats"},
+  {id:"habitos",l:"Hábitos",ic:"habits"},
+  {id:"configuracion",l:"Config",ic:"settings"},
+];
+const BottomNav=({active,go})=>{
+  const [masOpen,setMasOpen]=useState(false);
+  const enMas=NAV_MAS.some(n=>n.id===active);
+  return(
+    <>
+      {masOpen&&(
+        <div onClick={()=>setMasOpen(false)} style={{position:"fixed",inset:0,zIndex:199,background:"rgba(26,26,24,.4)",backdropFilter:"blur(4px)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",bottom:70,left:12,right:12,background:C.white,borderRadius:20,padding:"16px 8px",boxShadow:"0 -4px 24px rgba(0,0,0,.12)"}}>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:4}}>
+              {NAV_MAS.map(n=>(
+                <button key={n.id} onClick={()=>{go(n.id);setMasOpen(false);}}
+                  style={{display:"flex",flexDirection:"column",alignItems:"center",gap:6,padding:"14px 8px",background:active===n.id?`${C.botanico}12`:C.cream,borderRadius:14,border:`1px solid ${active===n.id?C.botanico+"30":C.graylight}`,cursor:"pointer",color:active===n.id?C.botanico:C.charcoal,fontSize:11,fontFamily:FB,fontWeight:active===n.id?600:400}}>
+                  <Ic n={n.ic} sz={20} c={active===n.id?C.botanico:C.graysoft}/>
+                  <span>{n.l}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
-        <span style={{textTransform:"uppercase",letterSpacing:".03em"}}>{n.l}</span>
-      </button>
-    ))}
-  </div>
-);
+      )}
+      <div style={{position:"fixed",bottom:0,left:0,right:0,background:C.white,borderTop:`1px solid ${C.graylight}`,display:"flex",zIndex:200,paddingBottom:"env(safe-area-inset-bottom)"}}>
+        {NAV_MOB.map(n=>(
+          <button key={n.id} onClick={()=>{go(n.id);setMasOpen(false);}}
+            style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0 6px",color:active===n.id?C.botanico:C.graysoft,fontSize:9,fontFamily:FB,fontWeight:active===n.id?600:400,transition:".14s"}}>
+            <div style={{width:30,height:30,borderRadius:9,background:active===n.id?`${C.botanico}15`:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <Ic n={n.ic} sz={17} c={active===n.id?C.botanico:C.graysoft}/>
+            </div>
+            <span style={{textTransform:"uppercase",letterSpacing:".03em"}}>{n.l}</span>
+          </button>
+        ))}
+        <button onClick={()=>setMasOpen(!masOpen)}
+          style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:2,background:"none",border:"none",cursor:"pointer",padding:"8px 0 6px",color:enMas||masOpen?C.botanico:C.graysoft,fontSize:9,fontFamily:FB,fontWeight:enMas||masOpen?600:400,transition:".14s"}}>
+          <div style={{width:30,height:30,borderRadius:9,background:enMas||masOpen?`${C.botanico}15`:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <Ic n="distribute" sz={17} c={enMas||masOpen?C.botanico:C.graysoft}/>
+          </div>
+          <span style={{textTransform:"uppercase",letterSpacing:".03em"}}>Más</span>
+        </button>
+      </div>
+    </>
+  );
+};
 
 // ─── DASHBOARD ───────────────────────────────────────────────────
 const Dashboard=({S,nombre,go})=>{
